@@ -1,35 +1,56 @@
 class Filter {
+  PImage outImage;
   
-  Filter() {}
-  
-  void grayScale(PImage image) {
-    image.loadPixels();
-    for(int j=0; j<image.width; j++) {
-      for(int k=0; k<image.height; k++) {
-        color c = image.get(j, k);
-        float gray = (red(c)+blue(c)+green(c))/3;
-        c = color(gray);
-        image.set(j, k, c);
-      }
-    }
-    image.updatePixels();
+  Filter() {
+    outImage = new PImage();
   }
   
-  void treshold(PImage image, int tresholdLimit) {
-    image.loadPixels();
+  PImage grayScale(PImage image) {
+    outImage = image.copy();
     for(int j=0; j<image.width; j++) {
       for(int k=0; k<image.height; k++) {
         color c = image.get(j, k);
-        float gray = (red(c)+blue(c)+green(c))/3;
+        float gray = getGray(c);
+        c = color(gray);
+        outImage.set(j, k, c);
+      }
+    }
+    return outImage;
+  }
+  
+  PImage treshold(PImage image, int tresholdLimit) {
+    outImage = image.copy();
+    for(int j=0; j<image.width; j++) {
+      for(int k=0; k<image.height; k++) {
+        color c = image.get(j, k);
+        float gray = getGray(c);
         if(gray > tresholdLimit) c = color(255);
         else c = color(0);
-        image.set(j, k, c);
+        outImage.set(j, k, c);
       }
     }
-    image.updatePixels();
+    return outImage;
   }
   
-  void motionCapture(PImage prevImage, PImage currImage) {
-    
+  PImage motionCapture(PImage prevImage, PImage currImage) {
+    outImage = prevImage.copy();
+    outImage.loadPixels();
+    for(int j=0; j<prevImage.width; j++) {
+      for(int k=0; k<prevImage.height; k++) {
+        color prevC = prevImage.get(j, k);
+        color currC = currImage.get(j, k);
+        float prevGray = getGray(prevC);
+        float currGray = getGray(currC);
+        float diff = abs(prevGray - currGray) - 20;
+        color c = color(diff);
+        outImage.pixels[j + k * currImage.width] = c;
+      }
+    }
+    outImage.updatePixels();
+    return outImage;
+  }
+  
+  private float getGray(color col) {
+    return (red(col)+blue(col)+green(col))/3;
   }
 }
