@@ -34,7 +34,6 @@ class Filter {
   
   PImage motionCapture(PImage prevImage, PImage currImage) {
     outImage = prevImage.copy();
-    outImage.loadPixels();
     for(int j=0; j<prevImage.width; j++) {
       for(int k=0; k<prevImage.height; k++) {
         color prevC = prevImage.get(j, k);
@@ -43,10 +42,25 @@ class Filter {
         float currGray = getGray(currC);
         float diff = abs(prevGray - currGray) - 20;
         color c = color(diff);
-        outImage.pixels[j + k * currImage.width] = c;
+        outImage.set(j, k, c);
       }
     }
-    outImage.updatePixels();
+    return outImage;
+  }
+  
+  PImage lowPass(PImage prevImage, PImage currImage, float amount) {
+    outImage = prevImage.copy();
+    for(int j=0; j<prevImage.width; j++) {
+      for(int k=0; k<prevImage.height; k++) {
+        color prevC = prevImage.get(j, k);
+        color currC = currImage.get(j, k);
+        float prevGray = getGray(prevC);
+        float currGray = getGray(currC);
+        float diff = abs(prevGray - currGray) * amount;
+        color c = color(currGray + diff);
+        outImage.set(j, k, c);
+      }
+    }
     return outImage;
   }
   

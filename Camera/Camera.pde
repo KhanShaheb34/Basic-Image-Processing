@@ -30,7 +30,7 @@ void updateFrame() {
   prevFrame = currFrame.copy();
   if(cam.available()) cam.read();
   currFrame = cam.copy();
-  outFrame = filter.motionCapture(prevFrame, currFrame);
+  outFrame = filter.lowPass(prevFrame, currFrame, 0.0);
 }
 
 void keyPressed() {
